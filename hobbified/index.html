@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hobbified</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ ГОРНА ЛЕНТА (показва се само след вход) ============ -->
+<header class="topbar" id="topbar" hidden>
+  <div class="topbar-inner">
+    <a href="#feed" class="logo">hobbi<span>fied</span></a>
+    <nav class="nav">
+      <a href="#feed" class="nav-link" data-view="feed">Начало</a>
+      <a href="#profile" class="nav-link" data-view="profile">Профил</a>
+      <a href="#friends" class="nav-link" data-view="friends">Приятели <span class="nav-badge" id="friendBadge" hidden>0</span></a>
+      <a href="#admin" class="nav-link nav-link--admin" data-view="admin" id="adminLink" hidden>Админ</a>
+      <a href="#games" class="nav-link" data-view="games">Мини игри</a>
+    </nav>
+    <div class="topbar-actions">
+      <div class="bell">
+        <button type="button" class="icon-btn" id="bellBtn" aria-label="Известия" aria-expanded="false" aria-controls="bellPanel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9zM10 20a2 2 0 0 0 4 0"/></svg>
+          <span class="icon-badge" id="bellBadge" hidden>0</span>
+        </button>
+        <div class="bell-panel" id="bellPanel" hidden></div>
+      </div>
+      <a href="#account" class="icon-btn" id="settingsLink" aria-label="Настройки" title="Настройки">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </a>
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Смяна на темата"></button>
+      <button class="btn btn--topbar btn--sm" id="logoutBtn" type="button" aria-label="Изход"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg><span>Изход</span></button>
+    </div>
+  </div>
+</header>
+
+<main id="app">
+
+  <!-- Вижда се само ако JavaScript файловете не са се заредили. app.js го скрива. -->
+  <div class="panel load-error" id="loadError">
+    <h2>Сайтът не можа да зареди файловете си</h2>
+    <p>Най-честата причина е, че index.html е отворен директно от ZIP архива. Първо разархивирай целия архив (десен бутон → „Extract All“ / „Извличане на всички“), после отвори index.html от разархивираната папка. Папките css и js трябва да са до index.html.</p>
+  </div>
+
+  <!-- ============ ВХОД / РЕГИСТРАЦИЯ ============ -->
+  <section class="view auth" id="view-auth" hidden>
+    <div class="auth-brand">
+      <div class="logo logo--big">hobbi<span>fied</span></div>
+      <p class="auth-tagline">Социалната мрежа, в която се запознаваш с хора по това, което обичаш да правиш.</p>
+      <ul class="auth-points">
+        <li>Добавяш хобитата си с конкретни детайли: любими игри, спортове, жанрове, видове риболов.</li>
+        <li>Хора със същите интереси ти излизат като предложения за приятели.</li>
+        <li>Вместо видеа – мини игри, в които се състезаваш с приятелите си.</li>
+      </ul>
+    </div>
+
+    <div class="auth-card">
+      <div class="tabs" role="tablist">
+        <a href="#login" class="tab" data-auth-tab="login">Вход</a>
+        <a href="#register" class="tab" data-auth-tab="register">Регистрация</a>
+      </div>
+
+      <form id="loginForm" class="form" novalidate>
+        <div class="field">
+          <label for="loginUsername">Потребителско име</label>
+          <input id="loginUsername" name="username" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="loginPassword">Парола</label>
+          <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <p class="form-error" id="loginError" hidden></p>
+        <button class="btn btn--primary btn--full" type="submit">Влез</button>
+        <p class="form-hint">Пробен профил: <b>niki.gamer</b> / <b>demo123</b><br>Админ: <b>admin</b> / <b>admin123</b></p>
+      </form>
+
+      <form id="registerForm" class="form" novalidate hidden>
+        <div class="field">
+          <label for="regName">Име и фамилия</label>
+          <input id="regName" name="name" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="regUsername">Потребителско име</label>
+          <input id="regUsername" name="username" autocomplete="username" required>
+          <small>3–20 символа: малки латински букви, цифри, точка и долна черта.</small>
+        </div>
+        <div class="field">
+          <label for="regEmail">Имейл</label>
+          <input id="regEmail" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="regPassword">Парола</label>
+            <input id="regPassword" name="password" type="password" autocomplete="new-password" required>
+          </div>
+          <div class="field">
+            <label for="regPassword2">Повтори паролата</label>
+            <input id="regPassword2" name="password2" type="password" autocomplete="new-password" required>
+          </div>
+        </div>
+        <p class="form-error" id="registerError" hidden></p>
+        <button class="btn btn--primary btn--full" type="submit">Създай профил</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ НАЧАЛНА СТРАНИЦА (FEED) ============
+       Три зони: лява колона до левия край, публикации в средата,
+       дясна колона до десния край. -->
+  <section class="view feed-layout" id="view-feed" hidden>
+    <aside class="sidebar sidebar--left">
+      <div class="panel" id="feedMe"></div>
+    </aside>
+
+    <div class="feed-main">
+      <form class="panel composer" id="composer">
+        <label class="sr-only" for="postText">Нова публикация</label>
+        <textarea id="postText" rows="3" maxlength="500" placeholder="Какво ново около хобитата ти?"></textarea>
+        <div class="composer-preview" id="composerPreview" hidden>
+          <img id="composerImg" alt="Избрана снимка">
+          <button type="button" class="composer-remove" id="composerRemove" aria-label="Махни снимката">×</button>
+        </div>
+        <div class="composer-bar">
+          <label class="icon-label" title="Добави снимка">
+            <input type="file" id="postImage" accept="image/*" class="sr-only">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg>
+            <span>Снимка</span>
+          </label>
+          <label class="sr-only" for="postHobby">Хоби</label>
+          <select id="postHobby"></select>
+          <span class="char-count" id="charCount">0 / 500</span>
+          <button class="btn btn--primary" type="submit">Публикувай</button>
+        </div>
+      </form>
+
+      <div class="filters" id="feedFilters"></div>
+      <div class="post-list" id="feedPosts"></div>
+    </div>
+
+    <aside class="sidebar sidebar--right">
+      <div class="panel" id="feedSuggestions"></div>
+      <div class="panel" id="popularHobbies"></div>
+      <div class="panel" id="feedGames"></div>
+    </aside>
+  </section>
+
+  <!-- ============ ПРОФИЛ ============ -->
+  <section class="view profile" id="view-profile" hidden>
+    <div class="panel profile-head" id="profileHead"></div>
+
+    <div class="panel locked" id="profileLocked" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <h2>Профилът е видим само за приятели</h2>
+      <p class="muted">Изпрати покана за приятелство, за да видиш хобитата и публикациите.</p>
+    </div>
+
+    <div class="profile-grid" id="profileBody">
+      <div class="panel profile-hobbies">
+        <div class="section-title">
+          <h2>Хобита</h2>
+          <span class="muted small" id="hobbySummary"></span>
+        </div>
+
+        <!-- Форма за добавяне: категория → избор на няколко неща → ниво -->
+        <form class="add-hobby" id="addHobbyForm" hidden>
+          <div class="add-hobby-row">
+            <div class="field">
+              <label for="hobbyCategory">Категория</label>
+              <div id="hobbyCategoryBox"></div>
+            </div>
+
+            <div class="field field--grow">
+              <span class="field-label" id="multiLabel">Избери</span>
+              <div class="multi" id="multi">
+                <button type="button" class="multi-toggle" id="multiToggle" aria-expanded="false" aria-labelledby="multiLabel multiSummary">
+                  <span id="multiSummary">Избери от списъка</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="multi-panel" id="multiPanel" hidden>
+                  <label class="sr-only" for="multiSearch">Търсене</label>
+                  <input id="multiSearch" placeholder="Търси…" autocomplete="off">
+                  <ul class="multi-list" id="multiList"></ul>
+                  <div class="multi-custom">
+                    <label class="sr-only" for="customItem">Друго</label>
+                    <input id="customItem" maxlength="40" placeholder="Няма го? Напиши го тук" autocomplete="off">
+                    <button class="btn btn--ghost btn--sm" type="button" id="addCustomBtn">Добави</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="hobbyLevel">Ниво</label>
+              <select id="hobbyLevel"></select>
+            </div>
+          </div>
+
+          <div class="add-hobby-foot">
+            <ul class="chips" id="selectedPreview"></ul>
+            <button class="btn btn--primary" type="submit" id="saveHobbyBtn">Запази</button>
+          </div>
+        </form>
+
+        <div class="hobby-grid" id="hobbyGrid"></div>
+      </div>
+
+      <div class="profile-posts">
+        <div class="panel profile-friends" id="profileFriends"></div>
+        <div class="section-title section-title--plain"><h2>Публикации</h2></div>
+        <div class="post-list" id="profilePosts"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ПРИЯТЕЛИ ============ -->
+  <section class="view page" id="view-friends" hidden>
+    <div class="page-head">
+      <div>
+        <h1>Приятели</h1>
+        <p class="muted" id="friendsIntro"></p>
+      </div>
+      <div class="search-box">
+        <label class="sr-only" for="peopleSearch">Търси хора</label>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="peopleSearch" type="search" placeholder="Търси хора по име…" autocomplete="off">
+      </div>
+    </div>
+    <div class="page-tabs" role="tablist"></div>
+    <ul class="people-grid" id="friendsList"></ul>
+  </section>
+
+  <!-- ============ МИНИ ИГРИ ============ -->
+  <section class="view page" id="view-games" hidden>
+    <div class="page-head">
+      <div>
+        <h1>Мини игри</h1>
+        <p class="muted">Играй, подобри рекорда си и изпревари приятелите си в класацията.</p>
+      </div>
+    </div>
+
+    <div class="games-grid" id="gamesHome"></div>
+
+    <div class="game-room" id="gameRoom" hidden>
+      <div class="panel game-main">
+        <div class="game-top">
+          <button type="button" class="btn btn--ghost btn--sm" data-games-back>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Всички игри
+          </button>
+          <h2 id="gameTitle"></h2>
+          <button type="button" class="sound-btn" id="soundToggle" aria-label="Звук" aria-pressed="true">
+            <svg class="on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+            <svg class="off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM17 9l5 6M22 9l-5 6"/></svg>
+          </button>
+          <div class="game-scores">
+            <div><span id="gameUnit">точки</span><b id="gameScore">0</b></div>
+            <div><span>рекорд</span><b id="gameBest">0</b></div>
+          </div>
+        </div>
+        <div class="game-stage" id="gameStage"></div>
+        <p class="game-message" id="gameMessage" aria-live="polite"></p>
+      </div>
+      <aside class="game-side">
+        <div class="panel" id="gameBoard"></div>
+        <div class="panel game-help" id="gameHelp"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ АДМИН ПАНЕЛ ============ -->
+  <section class="view page" id="view-admin" hidden>
+    <div class="page-head">
+      <div>
+        <h1>Админ панел</h1>
+        <p class="muted">Модериране на съдържанието и потребителите. Изтриването иска потвърждение.</p>
+      </div>
+      <div class="search-box">
+        <label class="sr-only" for="adminSearch">Търси</label>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="adminSearch" type="search" placeholder="Търси по текст или име…" autocomplete="off">
+      </div>
+    </div>
+    <div class="stat-tiles" id="adminStats"></div>
+    <div class="page-tabs" role="tablist"></div>
+    <ul class="panel mod-list" id="adminList"></ul>
+  </section>
+
+  <!-- ============ НАСТРОЙКИ ============ -->
+  <section class="view settings" id="view-account" hidden>
+    <aside class="settings-nav">
+      <h1>Настройки</h1>
+      <nav aria-label="Раздели на настройките">
+        <button type="button" data-jump="set-privacy">Поверителност</button>
+        <button type="button" data-jump="set-appearance">Външен вид</button>
+        <button type="button" data-jump="set-notifications">Известия</button>
+        <button type="button" data-jump="set-account">Акаунт и сигурност</button>
+        <button type="button" data-jump="set-danger" class="danger">Изтриване на профила</button>
+      </nav>
+      <p class="muted small settings-note">Името, града, рождения ден и описанието променяш от <a href="#profile" data-own-profile>профила си</a> → „Редактирай профила“.</p>
+    </aside>
+
+    <div class="settings-main">
+
+      <!-- Поверителност -->
+      <form class="panel settings-card" id="set-privacy">
+        <h2>Поверителност</h2>
+        <p class="muted">Избери какво от личните ти данни да виждат другите.</p>
+
+        <div class="setting-row">
+          <div>
+            <b>Рожден ден</b>
+            <span class="muted small">Как да се показва датата на раждане в профила ти.</span>
+          </div>
+          <label class="sr-only" for="setBirthdayVis">Показване на рождения ден</label>
+          <select id="setBirthdayVis">
+            <option value="full">Цялата дата</option>
+            <option value="dayMonth">Само ден и месец</option>
+            <option value="hidden">Скрит</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div>
+            <b>Показвай възрастта ми</b>
+            <span class="muted small">Изчислява се автоматично от рождения ден.</span>
+          </div>
+          <label class="switch"><input type="checkbox" id="setShowAge"><span class="sr-only">Показвай възрастта</span></label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <b>Показвай града ми</b>
+            <span class="muted small">Полезно, за да те намерят хора с хобита близо до теб.</span>
+          </div>
+          <label class="switch"><input type="checkbox" id="setShowCity"><span class="sr-only">Показвай града</span></label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <b>Кой вижда профила ми</b>
+            <span class="muted small">„Само приятели“ ще работи, когато добавим приятелствата.</span>
+          </div>
+          <label class="sr-only" for="setProfileVis">Видимост на профила</label>
+          <select id="setProfileVis">
+            <option value="everyone">Всички</option>
+            <option value="friends">Само приятели</option>
+          </select>
+        </div>
+      </form>
+
+      <!-- Външен вид -->
+      <div class="panel settings-card" id="set-appearance">
+        <h2>Външен вид</h2>
+        <p class="muted">Темата се запазва в този браузър.</p>
+        <div class="theme-options" role="radiogroup" aria-label="Тема">
+          <label class="theme-option">
+            <input type="radio" name="themeMode" value="light">
+            <span class="theme-swatch theme-swatch--light"></span>
+            Светла
+          </label>
+          <label class="theme-option">
+            <input type="radio" name="themeMode" value="dark">
+            <span class="theme-swatch theme-swatch--dark"></span>
+            Тъмна
+          </label>
+          <label class="theme-option">
+            <input type="radio" name="themeMode" value="system">
+            <span class="theme-swatch theme-swatch--system"></span>
+            Като устройството
+          </label>
+        </div>
+      </div>
+
+      <!-- Известия -->
+      <form class="panel settings-card" id="set-notifications">
+        <h2>Известия</h2>
+        <p class="muted">За какво да получаваш известия в камбанката горе.</p>
+        <div class="setting-row">
+          <div><b>Покани за приятелство</b><span class="muted small">Когато някой иска да станете приятели.</span></div>
+          <label class="switch"><input type="checkbox" data-notify="friendRequests"><span class="sr-only">Покани за приятелство</span></label>
+        </div>
+        <div class="setting-row">
+          <div><b>Коментари</b><span class="muted small">Когато някой коментира твоя публикация.</span></div>
+          <label class="switch"><input type="checkbox" data-notify="comments"><span class="sr-only">Коментари</span></label>
+        </div>
+        <div class="setting-row">
+          <div><b>Харесвания</b><span class="muted small">Когато някой хареса твоя публикация.</span></div>
+          <label class="switch"><input type="checkbox" data-notify="likes"><span class="sr-only">Харесвания</span></label>
+        </div>
+        <div class="setting-row">
+          <div><b>Рождени дни</b><span class="muted small">Напомняне за рождените дни на приятелите ти.</span></div>
+          <label class="switch"><input type="checkbox" data-notify="birthdays"><span class="sr-only">Рождени дни</span></label>
+        </div>
+        <div class="setting-row">
+          <div><b>Мини игри</b><span class="muted small">Когато приятел подобри рекорда ти в игра.</span></div>
+          <label class="switch"><input type="checkbox" data-notify="games"><span class="sr-only">Мини игри</span></label>
+        </div>
+      </form>
+
+      <!-- Акаунт и сигурност -->
+      <div class="panel settings-card" id="set-account">
+        <h2>Акаунт и сигурност</h2>
+
+        <form class="form sub-form" id="emailForm">
+          <h3>Имейл</h3>
+          <div class="field-row">
+            <div class="field">
+              <label for="setEmail">Нов имейл</label>
+              <input id="setEmail" type="email" autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="setEmailPass">Текуща парола</label>
+              <input id="setEmailPass" type="password" autocomplete="current-password">
+            </div>
+          </div>
+          <p class="form-error" id="emailError" hidden></p>
+          <div class="settings-actions"><button class="btn btn--primary" type="submit">Смени имейла</button></div>
+        </form>
+
+        <form class="form sub-form" id="passwordForm">
+          <h3>Парола</h3>
+          <div class="field-row">
+            <div class="field">
+              <label for="setOldPass">Текуща парола</label>
+              <input id="setOldPass" type="password" autocomplete="current-password">
+            </div>
+            <div class="field">
+              <label for="setNewPass">Нова парола</label>
+              <input id="setNewPass" type="password" autocomplete="new-password">
+            </div>
+            <div class="field">
+              <label for="setNewPass2">Повтори новата</label>
+              <input id="setNewPass2" type="password" autocomplete="new-password">
+            </div>
+          </div>
+          <p class="form-error" id="passwordError" hidden></p>
+          <div class="settings-actions"><button class="btn btn--primary" type="submit">Смени паролата</button></div>
+        </form>
+      </div>
+
+      <!-- Изтриване -->
+      <form class="panel settings-card settings-card--danger" id="set-danger">
+        <h2>Изтриване на профила</h2>
+        <p class="muted">Профилът, хобитата, публикациите, коментарите и харесванията ти ще бъдат изтрити завинаги.</p>
+        <div class="field">
+          <label for="deletePass">Въведи паролата си, за да потвърдиш</label>
+          <input id="deletePass" type="password" autocomplete="current-password">
+        </div>
+        <p class="form-error" id="deleteError" hidden></p>
+        <div class="settings-actions"><button class="btn btn--danger" type="submit" id="deleteBtn">Изтрий профила</button></div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<!-- Прозорче за потвърждение („Сигурен ли си?“) – ползва се от confirmDialog() в ui.js -->
+<div class="modal-backdrop" id="confirmModal" hidden>
+  <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+    <div class="modal-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M10 7V4h4v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>
+    </div>
+    <h2 id="confirmTitle"></h2>
+    <p id="confirmText"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn--ghost" id="confirmCancel">Откажи</button>
+      <button type="button" class="btn btn--danger" id="confirmOk">Изтрий</button>
+    </div>
+  </div>
+</div>
+
+<!-- Снимка на цял екран -->
+<div class="lightbox" id="lightbox" hidden>
+  <img alt="Снимка в голям размер">
+  <span class="lightbox-hint" id="lightboxHint">Кликни снимката за истински размер</span>
+  <button type="button" class="lightbox-close" aria-label="Затвори">×</button>
+</div>
+
+<!-- Редът на скриптовете е важен: data → auth → ui → feed/profile → app -->
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/combo.js"></script>
+<script src="js/images.js"></script>
+<script src="js/feed.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/friends.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/sounds.js"></script>
+<script src="js/games.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
